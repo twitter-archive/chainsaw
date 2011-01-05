@@ -46,31 +46,43 @@ object Logger {
 }
 
 class Logger(val underlying: slf4j.Logger) {
-  def isDebugEnabled = underlying.isDebugEnabled
-  def isErrorEnabled = underlying.isErrorEnabled
-  def isInfoEnabled = underlying.isInfoEnabled
+  import String.format
+
   def isTraceEnabled = underlying.isTraceEnabled
+  def isDebugEnabled = underlying.isDebugEnabled
+  def isInfoEnabled = underlying.isInfoEnabled
   def isWarnEnabled = underlying.isWarnEnabled
+  def isErrorEnabled = underlying.isErrorEnabled
 
   def trace(msg: String) = underlying.trace(msg)
-  def trace(msg: String, items: Any*) = underlying.trace(msg, items.toArray)
-  def trace(thrown: Throwable, msg: String, items: Any*) = underlying.trace(msg, thrown, items.toArray)
+  def trace(msg: String, items: Any*) =
+    if (isTraceEnabled) underlying.trace(msg.format(items: _*))
+  def trace(thrown: Throwable, msg: String, items: Any*) =
+    if (isTraceEnabled) underlying.trace(msg.format(items: _*), thrown)
 
   def debug(msg: String) = underlying.debug(msg)
-  def debug(msg: String, items: Any*) = underlying.debug(msg, items.toArray)
-  def debug(thrown: Throwable, msg: String, items: Any*) = underlying.debug(msg, thrown, items.toArray)
+  def debug(msg: String, items: Any*) =
+    if (isDebugEnabled) underlying.debug(msg.format(items: _*))
+  def debug(thrown: Throwable, msg: String, items: Any*) =
+    if (isDebugEnabled) underlying.debug(msg.format(items: _*), thrown)
 
   def info(msg: String) = underlying.info(msg)
-  def info(msg: String, items: Any*) = underlying.info(msg, items.toArray)
-  def info(thrown: Throwable, msg: String, items: Any*) = underlying.info(msg, thrown, items.toArray)
+  def info(msg: String, items: Any*) =
+    if (isInfoEnabled) underlying.info(msg.format(items: _*))
+  def info(thrown: Throwable, msg: String, items: Any*) =
+    if (isInfoEnabled) underlying.info(msg.format(items: _*), thrown)
 
   def warn(msg: String) = underlying.warn(msg)
-  def warn(msg: String, items: Any*) = underlying.warn(msg, items.toArray)
-  def warn(thrown: Throwable, msg: String, items: Any*) = underlying.warn(msg, thrown, items.toArray)
+  def warn(msg: String, items: Any*) =
+    if (isWarnEnabled) underlying.warn(msg.format(items: _*))
+  def warn(thrown: Throwable, msg: String, items: Any*) =
+    if (isWarnEnabled) underlying.warn(msg.format(items: _*), thrown)
 
   def error(msg: String) = underlying.error(msg)
-  def error(msg: String, items: Any*) = underlying.error(msg, items.toArray)
-  def error(thrown: Throwable, msg: String, items: Any*) = underlying.error(msg, thrown, items.toArray)
+  def error(msg: String, items: Any*) =
+    if (isErrorEnabled) underlying.error(msg.format(items: _*))
+  def error(thrown: Throwable, msg: String, items: Any*) =
+    if (isErrorEnabled) underlying.error(msg.format(items: _*), thrown)
 
   def ifTrace(msg: => String) = if (isTraceEnabled) underlying.trace(msg)
   def ifTrace(thrown: Throwable, msg: => String) = if (isTraceEnabled) underlying.trace(msg, thrown)
