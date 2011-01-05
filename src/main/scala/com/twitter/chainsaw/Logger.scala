@@ -13,7 +13,6 @@ object Logger {
     val stack = new Throwable().getStackTrace()
     val name = stack.view.map(_.getClassName).map(cleanupClassName)
       .find(!_.startsWith("com.twitter.chainsaw.Log")).get
-    Console.println("picked " + name + " off of stack")
     apply(name)
   }
 
