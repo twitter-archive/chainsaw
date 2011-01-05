@@ -9,7 +9,13 @@ object Logger {
    * declaration on the class/object. The class name is determined
    * by sniffing around on the stack.
    */
-  def apply(): Logger = get(2)
+  def apply(): Logger =  {
+    val stack = new Throwable().getStackTrace()
+    val name = stack.view.map(_.getClassName).map(cleanupClassName)
+      .find(!_.startsWith("com.twitter.chainsaw.Log")).get
+    Console.println("picked " + name + " off of stack")
+    apply(name)
+  }
 
   /**
    * Returns a logger for the name of the specified class.
@@ -30,13 +36,13 @@ object Logger {
    */
   def apply(obj: AnyRef): Logger = apply(obj.getClass())
 
-  private def get(depth: Int): Logger = getForClassName(new Throwable().getStackTrace()(depth).getClassName)
-
-  private def getForClassName(className: String) = {
-    apply(
-      if (className.endsWith("$")) className.substring(0, className.length - 1)
-      else className
-    )
+  private def cleanupClassName(className: String) = {
+    if (className.endsWith("$"))
+      className.substring(0, className.length - 1)
+    else if (className.endsWith("$class"))
+      className.substring(0, className.length - 6)
+    else
+      className
   }
 }
 
